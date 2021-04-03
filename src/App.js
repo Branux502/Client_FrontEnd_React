@@ -1,24 +1,34 @@
 import logo from './logo.svg';
 import './App.css';
+import { useEffect, useState } from 'react';
+import { useLayoutEffect } from 'react/cjs/react.development';
 
 function App() {
+
+  const[Student, setStudent] = useState([])
+  useEffect(() => {
+    ObtenerDatos()
+  }, [] )
+
+  const ObtenerDatos = async () => {
+    const data = await fetch('http://localhost:8090/api/v1/student')
+    const users = await data.json()
+    setStudent(users)
+  }
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+
+        <div>
+          <ul>
+            {
+              Student.map( item => (
+                <li key={item.id}>{item.name} - {item.email} - {item.dob} - {item.age}</li>
+                ))
+            }           
+          </ul>
+        </div>
+        
   );
 }
 
