@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
-import { Component, useEffect, useState } from 'react';
+import { Component, useEffect, useState, setState } from 'react';
 import { useLayoutEffect } from 'react/cjs/react.development';
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -19,7 +19,8 @@ class App extends Component {
 
   peticionGet=()=>{
     axios.get(url).then(response=>{
-      console.log(response.data)
+      this.setState({data:response.data});
+
     })
   }
 
@@ -35,7 +36,7 @@ class App extends Component {
           <br></br>
           <button className="btn btn-success">Agregar Estudiante</button>
           <br></br>
-            <table>
+            <table className="table">
               <thead>
                 <tr>
                   <th>Id</th>
@@ -45,6 +46,27 @@ class App extends Component {
                   <th>Edad</th>
                 </tr>
               </thead>
+              <tbody>
+                {
+                  this.state.data.map(student=>{
+                    return(
+                      <tr>
+
+                    <td>{student.id}</td>
+                    <td>{student.name}</td>
+                    <td>{student.email}</td>
+                    <td>{student.dob}</td>
+                    <td>{student.age}</td>
+                    <td>
+                    <button className="btn btn-primary"><FontAwesomeIcon icon={faEdit}/></button>
+                    {"  "}
+                    <button className="btn btn-danger"><FontAwesomeIcon icon={faTrashAlt}/></button>
+                    </td>
+                      </tr>
+                    )
+                  })
+                }
+              </tbody>
             </table>
 
 
