@@ -6,10 +6,12 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {Modal,ModalBody,ModalFooter,ModalHeader} from 'reactstrap';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faEdit, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
+import {faEdit, faLevelUpAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
 
 const url="http://localhost:8090/api/v1/student"
+const name="name=";
+const email="&email=";
 
 class App extends Component {
 
@@ -17,9 +19,11 @@ class App extends Component {
     data:[],
     modalInsertar: false,
     form:{
+      id: '',
       name: '',
       email: '',
-      dob: ''
+      dob: '',
+      tipoModal:''
     }
   }
 
@@ -32,6 +36,7 @@ class App extends Component {
   }
 
   peticionPost=async ()=>{
+    delete this.state.form.id;
    await axios.post(url,this.state.form).then(response=>{
       this.modalInsertar();
       this.peticionGet();
@@ -40,8 +45,33 @@ class App extends Component {
     })
   }
 
+
+  peticionPut=()=>{
+    delete this.state.form.dob;
+    axios.put('http://localhost:8090/api/v1/student/'+this.state.form.id+'?', name+this.state.form.name + email+this.state.form.email  ).then(response=>{
+      this.modalInsertar();
+      this.peticionGet();
+    }).catch(error=>{
+      console.log(error.message);
+      console.log(this.state.form);
+    })
+  }
+
+
   modalInsertar=()=>{
     this.setState({modalInsertar: !this.state.modalInsertar});
+  }
+
+  choseStudent=(student)=>{
+    this.setState({
+      tipoModal: 'actualizar',
+      form:{
+        id: student.id,
+        name: student.name,
+        email: student.email,
+        dob: student.dob
+      }
+    })
   }
 
   handleChange=async e=>{
@@ -67,7 +97,7 @@ class App extends Component {
 
         <div classname="App">
           <br /><br /><br />
-          <button className="btn btn-success" onClick={()=>this.modalInsertar()}>Agregar Estudiante</button>
+          <button className="btn btn-success" onClick={()=>{this.setState({form: null, tipoModal: 'insertar'}); this.modalInsertar()}}>Agregar Estudiante</button>
           <br></br>
             <table className="table">
               <thead>
@@ -91,7 +121,7 @@ class App extends Component {
                     <td>{student.dob}</td>
                     <td>{student.age}</td>
                     <td>
-                    <button className="btn btn-primary"><FontAwesomeIcon icon={faEdit}/></button>
+                    <button className="btn btn-primary"   onClick={()=>{this.choseStudent(student);this.modalInsertar()}}><FontAwesomeIcon icon={faEdit}/></button>
                     {"  "}
                     <button className="btn btn-danger"><FontAwesomeIcon icon={faTrashAlt}/></button>
                     </td>
@@ -108,24 +138,36 @@ class App extends Component {
                 </ModalHeader>
                 <ModalBody>
                   <div className="form-group">
+                  <label htmlFor="nombre">Id</label>
+                    <input className="form-control" type="text" name="id" readOnly onChange={this.handleChange} value={form?form.id: this.state.data.length+1}/>
+                    <br />
                     <label htmlFor="nombre">Nombre</label>
-                    <input className="form-control" type="text" name="name" onChange={this.handleChange} value={form.name}/>
+                    <input className="form-control" type="text" name="name" onChange={this.handleChange} value={form?form.name: ''}/>
                     <br />
                     <label htmlFor="nombre">Email</label>
-                    <input className="form-control" type="text" name="email" onChange={this.handleChange} value={form.email}/>
+                    <input className="form-control" type="email" name="email" placeholder="example@domain.com" onChange={this.handleChange} value={form?form.email: ''}/>
                     <br />
                     <label htmlFor="capital_bursatil">DOB</label>
-                    <input className="form-control" type="text"  name="dob" onChange={this.handleChange} value={form.dob}/>
-                    <br />
+                    {this.state.tipoModal=='insertar'?
+                    <input className="form-control" type="text"  name="dob" placeholder="YYYY-MM-DD" onChange={this.handleChange} value={form?form.dob: ''}/>
+                    :
+                    <input className="form-control" type="text"  name="dob" readOnly onChange={this.handleChange} value={form?form.dob: ''}/>
+                    }
+
+
                   </div>
                 </ModalBody>
 
                 <ModalFooter>
-                  
+                  {this.state.tipoModal=='insertar'?
                     <button className="btn btn-success" onClick={()=>this.peticionPost()}>
                     Insertar
-                  </button> 
-                  
+                  </button>:
+                 <button className="btn btn-primary" onClick={()=>this.peticionPut()}>
+                 Actualizar
+               </button>
+                }
+                   
                     <button className="btn btn-danger" onClick={()=>this.modalInsertar()}>Cancelar</button>
                 </ModalFooter>
           </Modal>
