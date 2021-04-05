@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faEdit, faLevelUpAlt, faTrashAlt} from '@fortawesome/free-solid-svg-icons';
 
 
-const url="http://localhost:8090/api/v1/student"
+const url="http://localhost:8090/api/v1/student/"
 const name="name=";
 const email="&email=";
 
@@ -18,6 +18,7 @@ class App extends Component {
   state={
     data:[],
     modalInsertar: false,
+    modalEliminar: false,
     form:{
       id: '',
       name: '',
@@ -48,15 +49,22 @@ class App extends Component {
 
   peticionPut=()=>{
     delete this.state.form.dob;
-    axios.put('http://localhost:8090/api/v1/student/'+this.state.form.id+'?', name+this.state.form.name + email+this.state.form.email  ).then(response=>{
+    axios.put(url+this.state.form.id+'?', name+this.state.form.name + email+this.state.form.email  ).then(response=>{
       this.modalInsertar();
       this.peticionGet();
     }).catch(error=>{
       console.log(error.message);
-      console.log(this.state.form);
     })
   }
 
+
+  peticionDelete=()=>{
+    axios.delete(url+this.state.form.id).then(response=>{
+      this.setState({modalEliminar:false});
+      this.peticionGet();
+    })
+
+  }
 
   modalInsertar=()=>{
     this.setState({modalInsertar: !this.state.modalInsertar});
@@ -123,7 +131,7 @@ class App extends Component {
                     <td>
                     <button className="btn btn-primary"   onClick={()=>{this.choseStudent(student);this.modalInsertar()}}><FontAwesomeIcon icon={faEdit}/></button>
                     {"  "}
-                    <button className="btn btn-danger"><FontAwesomeIcon icon={faTrashAlt}/></button>
+                    <button className="btn btn-danger" onClick={()=>{this.choseStudent(student);this.setState({modalEliminar:true})}}><FontAwesomeIcon icon={faTrashAlt}/></button>
                     </td>
                       </tr>
                     )
@@ -172,7 +180,15 @@ class App extends Component {
                 </ModalFooter>
           </Modal>
 
-
+          <Modal isOpen={this.state.modalEliminar}>
+            <ModalBody >
+               Estás seguro que deseas eliminar el Estudiante {form && form.nombre}
+            </ModalBody>
+            <ModalFooter>
+              <button className="btn btn-danger" onClick={()=>this.peticionDelete()}>Sí</button>
+              <button className="btn btn-secundary" onClick={()=>this.setState({modalEliminar:false})}>No</button>
+            </ModalFooter>
+          </Modal>
 
         </div>
         
