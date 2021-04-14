@@ -101,7 +101,10 @@ class Student extends Component{
     
             <div classname="container-fluid">
               <br /><br /><br />
-              <button className="btn btn-success" onClick={()=>{this.setState({form: null, tipoModal: 'insertar'}); this.modalInsertar()}}>Agregar Estudiante</button>
+              <div class="d-grid gap-2 col-6 mx-auto">
+
+              <button className="btn btn-primary" onClick={()=>{this.setState({form: null, tipoModal: 'insertar'}); this.modalInsertar()}}>Agregar Estudiante</button>
+              </div>
               <br></br>
                 <table className="table">
                   <thead>
@@ -111,6 +114,7 @@ class Student extends Component{
                       <th>Correo</th>
                       <th>DOB</th>
                       <th>Edad</th>
+                      <th>Opciones</th>
                     </tr>
                   </thead>
                   <tbody>
